@@ -1,51 +1,49 @@
-// backend/server.js
-const express = require("express");
-const http = require("http");
-const { Server } = require("socket.io");
-const path = require("path");
-const callC = require("./call_c");
-
-const app = express();
-const server = http.createServer(app);
-
-// Allow CORS for frontend
-const io = new Server(server, {
-  cors: {
-    origin: "*", // change to frontend URL in production
-    methods: ["GET", "POST"]
-  }
-});
-
-// Serve static files if needed
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// Simple API endpoint
-app.get("/api/health", (req, res) => {
-  res.json({ status: "Server is running 🚀" });
-});
-
-// Socket.IO connection
-io.on("connection", (socket) => {
-  console.log("🔌 A client connected:", socket.id);
-
-  // Listen for request to run C code
-  socket.on("run_c", async (data) => {
-    try {
-      const output = await callC(data.program, data.args || []);
-      socket.emit("c_output", { success: true, output });
-    } catch (err) {
-      socket.emit("c_output", { success: false, error: err.message });
+const { Socket } = require('dgram');
+const expsress = require('express');
+const http= require("http");
+const {server}= require("socket.io");
+const app= express();
+const { runCProgram } = require("./call_c"); 
+const server=http.createServer(app);
+const io=new server(server,
+    {
+        cors:
+        {
+            origin:"*",
+            METHODS:["GET","POST"]
+        }
     }
-  });
+);
+app.get("/", (req, res) => {
+  res.send("C Project Socket.IO Server is running 🚀");
+});
 
-  socket.on("disconnect", () => {
-    console.log("❌ A client disconnected:", socket.id);
+io.on("connection",(socket)=>
+{
+  console.log("connected:",socket.id);
+  socket.on("runc",(inputdata)=>
+{
+    console("running c code with inputs:",inputdata);
+    runCProgram(inputdata,(output)=>
+    {
+        socket.emit("output",output);
+        console.log("output:",output);
+
+    })
+})
+  socket.on("sensorData", (data) => {
+    console.log("Received sensor data:", data);
+    // broadcast to all clients (including frontend)
+    io.emit("sensorData", data);
+  });
+    socket.on("disconnect", () => {
+    console.log("Client disconnected:", socket.id);
   });
 });
 
-// Start server
-const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
-});
+
+
+server.listen(3000, ()=>
+{
+    console.log("server is connerted");
+})
