@@ -1,21 +1,28 @@
-// backend/call_c.js
-const { exec } = require("child_process");
-const path = require("path");
+const {exec}=require('child_process');
+const { stdout, stderr } = require('process');
+function  runCProgram(inputs,callback)
+{
+    const command='./program ${input}'
+    exec(command,(error,stdout,stderr)=>
+    {
+        if(error)
+        {
+            console.error(`error: ${error.message}`);
+            callback('error:${error.message}');
+            return;
+        }
+        if(stderr)
+        {
+     console.error("C Program Error:", stderr);
+      callback(`Error: ${stderr}`);
+      return;
+        }
+        else
+        {
+            callback(stdout.trim());
+        }
 
-function callC(program, args = []) {
-  return new Promise((resolve, reject) => {
-    const execPath = path.join(__dirname, "..", "dsa_c", program);
-
-    // Example: ./dsa_c/sliding_window.exe arg1 arg2
-    const command = `"${execPath}" ${args.join(" ")}`;
-
-    exec(command, (error, stdout, stderr) => {
-      if (error) {
-        return reject(new Error(`Execution failed: ${stderr || error.message}`));
-      }
-      resolve(stdout.trim());
     });
-  });
-}
+    module.exports = { runCProgram };
 
-module.exports = callC;
+}
