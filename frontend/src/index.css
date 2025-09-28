@@ -1,0 +1,113 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f0f2f5;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.dashboard-main {
+  display: flex;
+  gap: 20px;
+  flex: 1;
+}
+
+.map-panel,
+.stats-panel,
+.chart-panel {
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+}
+
+.map-panel {
+  flex: 2;
+  height: 500px;
+}
+
+.stats-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 15px;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  color: #333;
+}
+
+.stat-item i {
+  color: #1e90ff;
+}
+
+.stat-item span {
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.chart-panel {
+  height: 300px;
+}
+
+h2 {
+  margin: 0 0 10px;
+  font-size: 20px;
+  color: #2c3e50;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+h2 i {
+  color: #1e90ff;
+}
+
+.chart-container {
+  height: 100%;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .dashboard-main {
+    flex-direction: column;
+  }
+
+  .map-panel,
+  .stats-panel {
+    height: 400px;
+  }
+
+  .chart-panel {
+    height: 250px;
+  }
+}
+
+/* Fix Leaflet icon issue */
+.truck-icon {
+  background: transparent;
+  border: none;
+}
