@@ -1,12 +1,193 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPS Tracking Module</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Login Page -->
+    <div class="login-container" id="loginPage">
+        <div class="login-box">
+            <h2>🛰️ GPS Tracker Login</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required>
+                </div>
+                <button type="submit" class="btn">Login</button>
+                <div class="error-message" id="loginError">Invalid credentials</div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div class="dashboard" id="dashboard">
+        <div class="header">
+            <h1>🛰️ GPS Tracking Dashboard</h1>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="tab-container">
+            <button class="tab active" onclick="switchTab('overview')">Overview</button>
+            <button class="tab" onclick="switchTab('history')">History</button>
+            <button class="tab" onclick="switchTab('config')">Configuration</button>
+            <button class="tab" onclick="switchTab('logs')">Logs</button>
+        </div>
+
+        <!-- Overview Tab -->
+        <div class="tab-content active" id="overviewTab">
+            <!-- Alerts Section -->
+            <div class="card" id="alertsContainer">
+                <h3>⚠️ Alerts</h3>
+                <div id="alertsList">
+                    <p style="color: #666; text-align: center;">No active alerts</p>
+                </div>
+            </div>
+
+            <!-- Map -->
+            <div class="card">
+                <h3>📍 Live Location</h3>
+                <div id="map"></div>
+            </div>
+
+            <!-- Status Grid -->
+            <div class="grid">
+                <!-- GPS Data -->
+                <div class="card">
+                    <h3>📡 GPS Data</h3>
+                    <div class="status-item">
+                        <span class="status-label">Latitude:</span>
+                        <span class="status-value" id="latitude">--</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Longitude:</span>
+                        <span class="status-value" id="longitude">--</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Altitude:</span>
+                        <span class="status-value" id="altitude">--</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Speed:</span>
+                        <span class="status-value" id="speed">--</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Direction:</span>
+                        <span class="status-value" id="direction">--</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Last Update:</span>
+                        <span class="status-value" id="lastUpdate">--</span>
+                    </div>
+                </div>
+
+                <!-- Device Status -->
+                <div class="card">
+                    <h3>🔋 Device Status</h3>
+                    <div class="status-item">
+                        <span class="status-label">Battery Level:</span>
+                        <span class="status-value" id="battery">--</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">GPS Satellites:</span>
+                        <span class="status-value" id="satellites">--</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">WiFi Signal:</span>
+                        <span class="status-value" id="wifiSignal">--</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Uptime:</span>
+                        <span class="status-value" id="uptime">--</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">GPS Fix:</span>
+                        <span class="status-value" id="gpsFix">--</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- History Tab -->
+        <div class="tab-content" id="historyTab">
+            <div class="card">
+                <h3>📊 Location History</h3>
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>Latitude</th>
+                            <th>Longitude</th>
+                            <th>Speed</th>
+                            <th>Altitude</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTableBody">
+                        <tr>
+                            <td colspan="5" style="text-align: center; color: #666;">Loading history...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Configuration Tab -->
+        <div class="tab-content" id="configTab">
+            <div class="card">
+                <h3>⚙️ Configuration Settings</h3>
+                <form class="config-form" id="configForm">
+                    <div class="form-group">
+                        <label>WiFi SSID</label>
+                        <input type="text" id="wifiSsid" placeholder="Enter WiFi SSID">
+                    </div>
+                    <div class="form-group">
+                        <label>WiFi Password</label>
+                        <input type="password" id="wifiPassword" placeholder="Enter WiFi Password">
+                    </div>
+                    <div class="form-group">
+                        <label>Polling Interval (seconds)</label>
+                        <input type="number" id="pollingInterval" value="5" min="1" max="60">
+                    </div>
+                    <div class="form-group">
+                        <label>Geofence Center Latitude</label>
+                        <input type="number" step="any" id="geofenceLat" placeholder="e.g., 10.9026">
+                    </div>
+                    <div class="form-group">
+                        <label>Geofence Center Longitude</label>
+                        <input type="number" step="any" id="geofenceLon" placeholder="e.g., 76.9017">
+                    </div>
+                    <div class="form-group">
+                        <label>Geofence Radius (meters)</label>
+                        <input type="number" id="geofenceRadius" placeholder="e.g., 1000">
+                    </div>
+                    <button type="submit">Save Configuration</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Logs Tab -->
+        <div class="tab-content" id="logsTab">
+            <div class="card">
+                <h3>📝 System Logs</h3>
+                <div class="log-viewer" id="logViewer">
+                    <div class="log-entry">
+                        <span class="log-timestamp">[Loading...]</span>
+                        <span class="log-info"> Initializing log viewer...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+    <script src="app.js"></script>
+</body>
 </html>
