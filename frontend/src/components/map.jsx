@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet';
+import React, { useEffect, useState } from 'react';
+import { MapContainer, TileLayer, Marker, Polyline, Tooltip, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -14,7 +14,7 @@ function MapUpdater({ position }) {
   const map = useMap();
   useEffect(() => {
     if (position) {
-      map.setView(position, 13); // Center map on vehicle
+      map.setView(position, 15); // Center map on vehicle
     }
   }, [position, map]);
   return null;
@@ -22,6 +22,13 @@ function MapUpdater({ position }) {
 
 function Map({ position }) {
   const defaultPosition = [51.505, -0.09]; // Fallback position
+  const [route, setRoute] = useState([]);
+
+  useEffect(() => {
+    if (position) {
+      setRoute((prevRoute) => [...prevRoute, position]); // Add new point to trail
+    }
+  }, [position]);
 
   return (
     <MapContainer
@@ -33,7 +40,22 @@ function Map({ position }) {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       />
-      {position && <Marker position={position} icon={truckIcon} />}
+
+      {/* Vehicle Marker */}
+      {position && (
+        <Marker position={position} icon={truckIcon}>
+          <Tooltip direction="top" offset={[0, -20]} opacity={1}>
+            🚚 Vehicle<br />
+            Lat: {position[0].toFixed(4)}, Lon: {position[1].toFixed(4)}
+          </Tooltip>
+        </Marker>
+      )}
+
+      {/* Route Polyline */}
+      {route.length > 1 && (
+        <Polyline positions={route} color="blue" weight={3} opacity={0.7} />
+      )}
+
       <MapUpdater position={position} />
     </MapContainer>
   );
