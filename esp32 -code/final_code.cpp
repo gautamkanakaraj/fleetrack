@@ -4,8 +4,8 @@
 #include <TinyGPS++.h>
 #include <HardwareSerial.h>
 
-const char* ssid = "OnePlus Nord CE 3 Lite 5G";
-const char* password = "123456780";
+const char* ssid = "*******";
+const char* password = "******";
 
 // 🚀 Use your ngrok HTTPS URL here
 String serverURL = "https://manuel-li.ngrok-free.dev/data";
